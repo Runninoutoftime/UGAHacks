@@ -1,10 +1,12 @@
 import os
 from PIL import Image as pimg
 import cv2
+import time
+import database
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/will/Downloads/ugahacks.json"
 
-def localize_objects(path, output):
+def localize_objects(path):
     """Localize objects in the local image.
 
     Args:
@@ -13,12 +15,10 @@ def localize_objects(path, output):
 
     im = pimg.open(path)
     width, height = im.size
-    arrX = []
-    arrY = []
-    tlx = 0
-    tly = 0
-    brx = 0
-    bry = 0
+    tlx = []
+    tly = []
+    brx = []
+    bry = []
     i = 0
 
     from google.cloud import vision
@@ -28,33 +28,33 @@ def localize_objects(path, output):
         content = image_file.read()
     image = vision.Image(content=content)
 
-    objects = client.object_localization(
-        image=image).localized_object_annotations
+    objects = client.object_localization(image=image).localized_object_annotations
     
     for object_ in objects:
-        
+        i = 0
+
         for vertex in object_.bounding_poly.normalized_vertices:
+
             # Converts back to non-normalized vertices
-            arrX.append(vertex.x * width)
-            arrY.append(vertex.y * height)
-            
             if i == 0:
-                tlx = vertex.x * width
-                tly = vertex.y * height
+                tlx.append(vertex.x * width)
+                tly.append(vertex.y * height)
             if i == 2:
-                brx = vertex.x * width
-                bry = vertex.y * height
+                brx.append(vertex.x * width)
+                bry.append(vertex.y * height)
+
             i = i + 1
-
-    print(objects[0].name)
-    print(tlx, tly, brx, bry)
-    crop = (tlx, tly, brx, bry)
-    crop_img = im.crop(crop)
-    crop_img.show()
-
-        #print(arrX)
-        #print(arrY)
-
+    
+    for x in range(len(objects)):
+        print(objects[x].name)
+        print(tlx[x], tly[x], brx[x], bry[x])
+        crop = (tlx[x], tly[x], brx[x], bry[x])
+        crop_img = im.crop(crop)
+        crop_img = crop_img.rotate(-90)
+        #crop_img.show()
+        name = ("/home/will/Desktop/UGAHacks/cropImgs_" + str(x) + ".jpg")
+        crop_img.save(name, "JPEG")
+        database.name.append(objects[x].name)
 
 
     # Prints info about objects found in image. Useful for debugging. TL, TR, BR, BL
@@ -67,4 +67,4 @@ def localize_objects(path, output):
     
 
 
-localize_objects("/home/will/Downloads/jakey.jpg", "/home/will/Downloads/jakey2.jpg")
+localize_objects("/home/will/Downloads/jakey.jpg")
