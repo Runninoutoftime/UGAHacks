@@ -41,14 +41,14 @@ def localize_objects(path, output):
             if i == 0:
                 tlx = vertex.x * width
                 tly = vertex.y * height
-            if i == 1:
+            if i == 2:
                 brx = vertex.x * width
                 bry = vertex.y * height
             i = i + 1
 
     print(objects[0].name)
     print(tlx, tly, brx, bry)
-    crop = (brx, bry, tlx, bry)
+    crop = (tlx, tly, brx, bry)
     crop_img = im.crop(crop)
     crop_img.show()
 
