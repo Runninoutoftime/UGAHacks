@@ -3,6 +3,8 @@ from PIL import Image as pimg
 import cv2
 import time
 import database
+import glob
+import shutil as sh
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/will/Downloads/ugahacks.json"
 
@@ -45,16 +47,23 @@ def localize_objects(path):
 
             i = i + 1
     
+    i = 0
     for x in range(len(objects)):
         print(objects[x].name)
         print(tlx[x], tly[x], brx[x], bry[x])
-        crop = (tlx[x], tly[x], brx[x], bry[x])
-        crop_img = im.crop(crop)
-        crop_img = crop_img.rotate(-90)
-        #crop_img.show()
-        name = ("/home/will/Desktop/UGAHacks/cropImgs_" + str(x) + ".jpg")
-        crop_img.save(name, "JPEG")
-        database.name.append(objects[x].name)
+        allowed = ["Top", "Shoe", "Person", "Pants"]
+
+        if objects[x].name in allowed:
+            crop = (tlx[x], tly[x], brx[x], bry[x])
+            crop_img = im.crop(crop)
+            crop_img = crop_img.rotate(-90)
+            #crop_img.show()
+            name = ("/home/will/Desktop/UGAHacks/cropImgs/img_" + str(i) + ".jpg")
+            crop_img.save(name, "JPEG")
+            database.name.append(objects[x].name)
+            i = i + 1
+        
+
 
 
     # Prints info about objects found in image. Useful for debugging. TL, TR, BR, BL
@@ -67,4 +76,8 @@ def localize_objects(path):
     
 
 
-localize_objects("/home/will/Downloads/jakey.jpg")
+sh.rmtree("/home/will/Desktop/UGAHacks/cropImgs/")
+os.makedirs("/home/will/Desktop/UGAHacks/cropImgs")
+
+localize_objects("/home/will/Downloads/kaelyn.jpg")
+print(database.name)
