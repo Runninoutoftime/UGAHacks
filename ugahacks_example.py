@@ -18,6 +18,8 @@ import numpy as np
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/will/Downloads/ugahacks.json"
 
+# Creates a list of localized objects in an image.
+# Finds bounding boxes around them, then saves them to database along with ID
 def localize_objects(path):
     """Localize objects in the local image.
 
@@ -59,10 +61,7 @@ def localize_objects(path):
     
     i = 0
     for x in range(len(objects)):
-        print(objects[x].name)
-        print(tlx[x], tly[x], brx[x], bry[x])
-
-        allowed = ["Top", "Shoe", "Person", "Pants", "Footwear"]
+        allowed = ["Top", "Shoe", "Pants", "Footwear", "Dress"]
 
         if objects[x].name in allowed:
             crop = (tlx[x], tly[x], brx[x], bry[x])
@@ -74,6 +73,7 @@ def localize_objects(path):
             database.name.append(objects[x].name)
             i = i + 1
     
+# Finds dominant color among an image
 def find_colors():
     
     for x in range(len(database.name)):
@@ -82,18 +82,20 @@ def find_colors():
         print(dc)
         print(webcolors.rgb_to_hex(dc))
 
-
+# Removes background on images
 def remove_background():
-    
-    file = "/home/will/Desktop/UGAHacks/cropImgs/img_0.jpg"
-    output_file = "/home/will/Desktop/UGAHacks/pngImgs/img_0.png"
-    subprocess.Popen(["backgroundremover", "-i", file, "-o", output_file])
 
+    for x in range(len(database.name)):
+        file = "/home/will/Desktop/UGAHacks/cropImgs/img_" + str(x) + ".jpg"
+        output_file = "/home/will/Desktop/UGAHacks/pngImgs/img_" + str(x) + ".png"
+        subprocess.call(["backgroundremover", "-i", file, "-o", output_file])
 
 
 
 sh.rmtree("/home/will/Desktop/UGAHacks/cropImgs/")
+sh.rmtree("/home/will/Desktop/UGAHacks/pngImgs/")
 os.makedirs("/home/will/Desktop/UGAHacks/cropImgs")
+os.makedirs("/home/will/Desktop/UGAHacks/pngImgs")
 
 localize_objects("/home/will/Downloads/will.jpg")
 print(database.name)
