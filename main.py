@@ -4,25 +4,59 @@ from PIL import Image as pimg
 print("test")
 print(database.color)
 
-x = 0
-for elem in database.color:
+# Using readlines()
+file1 = open('namesTxt.txt', 'r')
+Lines = file1.readlines()
+ 
+count = 0
+# Strips the newline character
+for line in Lines:
+    count += 1
+    print("Line{}: {}".format(count, line.strip()))
+    database.name.append(line.strip())
 
-    R = elem[0]
-    G = elem[1]
-    B = elem[2]
+with open("wardrobePantColor.txt") as file2:
+    R1, G1, B1 = [int(x) for x in next(file2).split()]
+    database.wardrobePantColor.append((R1, G1, B1))
+
+
+# for line in f2:
+#     database.wardrobePantColor.append(line.strip())
     
+
+print(database.wardrobePantColor)
+
+file3 = open("wardrobePantPath.txt")
+f3 = file3.readlines()
+
+for line in f3:
+    database.wardrobePantPath.append(line.strip())
+
+
+for x in range(len(database.name)):
+
+    with open("colorTxt.txt") as f:
+        R, G, B = [int(x) for x in next(f).split()]
+        
+        print("RGB: ", R, G, B)
     i = 0
 
     pants = ["Jeans", "Pants"]
-    if database.name[x] in pants:
+    if str(database.name[x]) in pants:
+        print("b")
         for pant in database.wardrobePantColor:
+            print("a")
+            print("A: ", pant[0], pant[1], pant[2])
             if (
-                pant[0] >= R - 10 and pant[0] <= R + 10 and
-                pant[1] >= G - 10 and pant[1] <= G + 10 and
-                pant[2] >= B - 10 and pant[2] <= B + 10
+                int(pant[0]) >= R - 10 and int(pant[0]) <= R + 10 and
+                int(pant[1]) >= G - 10 and int(pant[1]) <= G + 10 and
+                int(pant[2]) >= B - 10 and int(pant[2]) <= B + 10
                 ):
 
-                pimg.show(database.wardrobePantPath[i])
+                print("tt")
+                with pimg.open("".join(database.wardrobePantPath)) as im:
+                    im.show()
+            
             i = i + 1
 
     i = 0
@@ -35,8 +69,9 @@ for elem in database.color:
                 shirt[1] >= G - 10 and shirt[1] <= G + 10 and
                 shirt[2] >= B - 10 and shirt[2] <= B + 10
                 ):
+                
+                print("show shirt")
 
-                pimg.show(database.wardrobeShirtPath)
 
     i = 0
 
@@ -48,7 +83,7 @@ for elem in database.color:
             shoe[2] >= B - 10 and shoe[2] <= B + 10
             ):
 
-            pimg.show(database.wardrobeShoePath)    
+            print("show shoe")
 
     x = x + 1
 

@@ -146,10 +146,17 @@ def process(path):
     find_colors() #List of all rgb dominant colors for each item in outfit
 
     print(str(database.color))
+
     txt = open("colorTxt.txt", "w")
     for t in database.color:
         txt.write(' '.join(str(s) for s in t) + "\n")
     txt.close()
+
+    names = open("namesTxt.txt", "w")
+    for t in database.name:
+        names.write(''.join(str(s) for s in t) + "\n")
+    names.close()
+
 
 
 #def startup():
