@@ -66,12 +66,19 @@ def localize_objects(path):
     
     i = 0
     for x in range(len(objects)):
-        allowed = ["Top", "Shoe", "Pants", "Footwear", "Dress"]
+        allowed = ["Top", "Shoe", "Pants", "Footwear", "Dress", "Outerwear", "Jeans", "Jacket"]
+        shoesFound = False
+
 
         if objects[x].name in allowed:
+            if objects[x].name == "Shoe" or "Footwear":
+                shoesFound = True
+            if shoesFound == True:
+                allowed.remove("Shoe")
+                allowed.remove("Footwear")
             crop = (tlx[x], tly[x], brx[x], bry[x])
             crop_img = im.crop(crop)
-            crop_img = crop_img.rotate(-90)
+            #crop_img = crop_img.rotate(-90)
             #crop_img.show()
             name = ("/home/will/Desktop/UGAHacks/cropImgs/img_" + str(i) + ".jpg")
             crop_img.save(name, "JPEG")
@@ -107,19 +114,20 @@ def remove_background():
 def gatherStyle():
     sh.rmtree("/home/will/Desktop/UGAHacks/googleStyle")
     os.makedirs("/home/will/Desktop/UGAHacks/googleStyle")
-
+    query = database.age_group + " " + database.skin_tone + " " + database.gender + " " + database.formality + " " + database.season + ""
     params = {
-        'q': database.age_group + " " + database.skin_tone + " " + database.gender + " " + database.formality + " " + database.season + " outfit",
+        'q': query,
         'num': 1,
-        'safe': "medium",
         "fileType": "jpg",
         "imgColorType": "color",
+        #"imgSize": "HUGE"
     }
-
+    
+    print(query)
     gis.search(search_params=params, path_to_dir="/home/will/Desktop/UGAHacks/googleStyle")
     
     return "/home/will/Desktop/UGAHacks/googleStyle"
-
+    
 
 # Main loop
 # Analyzes image, segments clothing, removes background, and analyzes the colors of the clothing
@@ -153,5 +161,6 @@ path = ' '.join(pathList)
 path = "/home/will/Desktop/UGAHacks/googleStyle/" + path
 #path = str(os.listdir(dir))[1, os.listdir(dir).length - 1, 1]
 
+path = "/home/will/Downloads/f.jpg"
 print(path)
 process(path)
