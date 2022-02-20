@@ -2,8 +2,11 @@ import os
 from PIL import Image as pimg
 import cv2
 import time
+import getcolor
+import colorfinder
 import subprocess
 import backgroundremover
+from google_images_search import GoogleImagesSearch
 
 from matplotlib.pyplot import gray
 import database
@@ -17,6 +20,8 @@ import numpy as np
 
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/will/Downloads/ugahacks.json"
+mainloop = 0
+gis = GoogleImagesSearch("AIzaSyBAjAcE1EJIKgIEZlYRpRfDBkbnU138DYg", "17188311404214169")
 
 # Creates a list of localized objects in an image.
 # Finds bounding boxes around them, then saves them to database along with ID
@@ -77,27 +82,76 @@ def localize_objects(path):
 def find_colors():
     
     for x in range(len(database.name)):
-        cf = ColorThief("/home/will/Desktop/UGAHacks/cropImgs/img_" + str(x) + ".jpg")
+        cf = ColorThief("/home/will/Desktop/UGAHacks/pngImgs/img_" + str(x) + ".png")
         dc = cf.get_color(quality=1)
         print(dc)
-        print(webcolors.rgb_to_hex(dc))
+        database.color.append(dc)
+        #print(webcolors.rgb_to_hex(dc))
+        #colors = getcolor.get_colors("/home/will/Desktop/UGAHacks/pngImgs/img_" + str(x) + ".png", numcolors=3, resize=150)
+        #colors = colorfinder.colorz("/home/will/Desktop/UGAHacks/pngImgs/img_" + str(x) + ".png")
+        #print("Name: " + database.name[x] + " Color: " + str(list(colors)))
 
-# Removes background on images
+
+
+# Removes background on images and stores them as JPG after converting from PNG
 def remove_background():
 
     for x in range(len(database.name)):
         file = "/home/will/Desktop/UGAHacks/cropImgs/img_" + str(x) + ".jpg"
         output_file = "/home/will/Desktop/UGAHacks/pngImgs/img_" + str(x) + ".png"
+#        final_file = "/home/will/Desktop/UGAHacks/jpgImgs/img_" + str(x) + ".jpg"
         subprocess.call(["backgroundremover", "-i", file, "-o", output_file])
+#        im = pimg.open(output_file)
+#        im.save(final_file)
+
+def gatherStyle():
+    sh.rmtree("/home/will/Desktop/UGAHacks/googleStyle")
+    os.makedirs("/home/will/Desktop/UGAHacks/googleStyle")
+
+    params = {
+        'q': database.age_group + " " + database.skin_tone + " " + database.gender + " " + database.formality + " " + database.season + " outfit",
+        'num': 1,
+        'safe': "medium",
+        "fileType": "jpg",
+        "imgColorType": "color",
+    }
+
+    gis.search(search_params=params, path_to_dir="/home/will/Desktop/UGAHacks/googleStyle")
+    
+    return "/home/will/Desktop/UGAHacks/googleStyle"
+
+
+# Main loop
+# Analyzes image, segments clothing, removes background, and analyzes the colors of the clothing
+def process(path):
+
+    sh.rmtree("/home/will/Desktop/UGAHacks/cropImgs/")
+    sh.rmtree("/home/will/Desktop/UGAHacks/pngImgs/")
+    os.makedirs("/home/will/Desktop/UGAHacks/cropImgs")
+    os.makedirs("/home/will/Desktop/UGAHacks/pngImgs")
+
+    localize_objects(path)
+    print(database.name)
+
+    remove_background()
+    
+    find_colors() #List of all rgb dominant colors for each item in outfit
+
+    print(str(database.color))
+
+
+#def startup():
 
 
 
-sh.rmtree("/home/will/Desktop/UGAHacks/cropImgs/")
-sh.rmtree("/home/will/Desktop/UGAHacks/pngImgs/")
-os.makedirs("/home/will/Desktop/UGAHacks/cropImgs")
-os.makedirs("/home/will/Desktop/UGAHacks/pngImgs")
 
-localize_objects("/home/will/Downloads/will.jpg")
-print(database.name)
+#path = "/home/will/Downloads/will2.jpg"
 
-remove_background()
+dir = gatherStyle()
+pathList = os.listdir(dir)
+path = ' '.join(pathList)
+path = "/home/will/Desktop/UGAHacks/googleStyle/" + path
+#path = str(os.listdir(dir))[1, os.listdir(dir).length - 1, 1]
+
+print(path)
+process(path)
