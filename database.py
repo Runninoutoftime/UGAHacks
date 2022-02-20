@@ -4,9 +4,9 @@ color = []
 
 # Results fter running CSAA.py on wardrobe images
 wardrobeShirtColor = []
-wardrobePantColor = []
+wardrobePantColor = [(23, 20, 55), (239, 198, 145)]
 wardrobeShoeColor = []
-wardrobePantPath = []
+wardrobePantPath = ["/home/will/Desktop/UGAHacks/wardrobe/pants/jeans.png"]
 wardrobeShirtPath = []
 wardrobeShoePath = []
 

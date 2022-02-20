@@ -146,6 +146,10 @@ def process(path):
     find_colors() #List of all rgb dominant colors for each item in outfit
 
     print(str(database.color))
+    txt = open("colorTxt.txt", "w")
+    for t in database.color:
+        txt.write(' '.join(str(s) for s in t) + "\n")
+    txt.close()
 
 
 #def startup():
@@ -161,6 +165,6 @@ path = ' '.join(pathList)
 path = "/home/will/Desktop/UGAHacks/googleStyle/" + path
 #path = str(os.listdir(dir))[1, os.listdir(dir).length - 1, 1]
 
-path = "/home/will/Downloads/f.jpg"
+path = "/home/will/Desktop/UGAHacks/person.jpg"
 print(path)
 process(path)
