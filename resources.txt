@@ -1,1 +1,3 @@
 https://cloud.google.com/vision/docs/libraries#client-libraries-install-python
+
+Get most dominant color across multiple conflicting named entries (ignoring skin tone)

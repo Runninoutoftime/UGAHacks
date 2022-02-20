@@ -2,9 +2,19 @@ import os
 from PIL import Image as pimg
 import cv2
 import time
+import subprocess
+import backgroundremover
+
+from matplotlib.pyplot import gray
 import database
 import glob
 import shutil as sh
+from colorthief import ColorThief
+import webcolors
+from google.cloud import storage, vision
+import requests
+import numpy as np
+
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/will/Downloads/ugahacks.json"
 
@@ -51,7 +61,8 @@ def localize_objects(path):
     for x in range(len(objects)):
         print(objects[x].name)
         print(tlx[x], tly[x], brx[x], bry[x])
-        allowed = ["Top", "Shoe", "Person", "Pants"]
+
+        allowed = ["Top", "Shoe", "Person", "Pants", "Footwear"]
 
         if objects[x].name in allowed:
             crop = (tlx[x], tly[x], brx[x], bry[x])
@@ -62,22 +73,29 @@ def localize_objects(path):
             crop_img.save(name, "JPEG")
             database.name.append(objects[x].name)
             i = i + 1
-        
-
-
-
-    # Prints info about objects found in image. Useful for debugging. TL, TR, BR, BL
-    # print('Number of objects found: {}'.format(len(objects)))
-    # for object_ in objects:
-    #     print('\n{} (confidence: {})'.format(object_.name, object_.score))
-    #     print('Normalized bounding polygon vertices: ')
-    #     for vertex in object_.bounding_poly.normalized_vertices:
-    #         print(' - ({}, {})'.format(vertex.x, vertex.y))
     
+def find_colors():
+    
+    for x in range(len(database.name)):
+        cf = ColorThief("/home/will/Desktop/UGAHacks/cropImgs/img_" + str(x) + ".jpg")
+        dc = cf.get_color(quality=1)
+        print(dc)
+        print(webcolors.rgb_to_hex(dc))
+
+
+def remove_background():
+    
+    file = "/home/will/Desktop/UGAHacks/cropImgs/img_0.jpg"
+    output_file = "/home/will/Desktop/UGAHacks/pngImgs/img_0.png"
+    subprocess.Popen(["backgroundremover", "-i", file, "-o", output_file])
+
+
 
 
 sh.rmtree("/home/will/Desktop/UGAHacks/cropImgs/")
 os.makedirs("/home/will/Desktop/UGAHacks/cropImgs")
 
-localize_objects("/home/will/Downloads/kaelyn.jpg")
+localize_objects("/home/will/Downloads/will.jpg")
 print(database.name)
+
+remove_background()
