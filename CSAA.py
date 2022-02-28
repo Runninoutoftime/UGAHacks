@@ -21,7 +21,9 @@ import numpy as np
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/will/Downloads/ugahacks.json"
 mainloop = 0
-gis = GoogleImagesSearch("AIzaSyBAjAcE1EJIKgIEZlYRpRfDBkbnU138DYg", "17188311404214169")
+# Had to remove Google API Key - whoops!
+# Add API key in parameters below to get gis working
+gis = GoogleImagesSearch()
 
 # Creates a list of localized objects in an image.
 # Finds bounding boxes around them, then saves them to database along with ID
